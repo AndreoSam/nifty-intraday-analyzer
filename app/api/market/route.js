@@ -1,0 +1,5 @@
+import {NextResponse} from 'next/server';
+import {analyze} from '@/lib/analysis';
+export const runtime='nodejs';
+async function getChart(symbol,interval='5m',range='5d'){const url=`https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(symbol)}?interval=${interval}&range=${range}&events=history`;const res=await fetch(url,{headers:{'User-Agent':'Mozilla/5.0'},cache:'no-store'});if(!res.ok)throw new Error(`Market data source returned ${res.status}`);const j=await res.json();const r=j.chart?.result?.[0];if(!r)throw new Error('No market data returned');const q=r.indicators.quote[0];return r.timestamp.map((t,i)=>({time:t*1000,open:q.open[i],high:q.high[i],low:q.low[i],close:q.close[i],volume:q.volume?.[i]||0})).filter(x=>[x.open,x.high,x.low,x.close].every(Number.isFinite));}
+export async function GET(req){try{const {searchParams}=new URL(req.url);const symbol=searchParams.get('symbol')||'^NSEI';const interval=searchParams.get('interval')||'5m';const rows=await getChart(symbol,interval,'5d');return NextResponse.json({symbol,interval,updatedAt:Date.now(),analysis:analyze(rows)});}catch(e){return NextResponse.json({error:e.message},{status:502})}}
