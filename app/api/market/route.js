@@ -1,5 +1,5 @@
 import {NextResponse} from 'next/server';
-import {analyze} from '@/lib/analysis';
+import {analyze} from '@/lib/analysis';import {evaluateStrategies} from '@/lib/strategies';
 export const runtime='nodejs';
 const INDEXES=[
  {id:'NIFTY',name:'NIFTY 50',symbol:'^NSEI'},
@@ -17,7 +17,7 @@ async function getChart(symbol,interval='5m',range='5d'){
 export async function GET(req){
  const {searchParams}=new URL(req.url);const interval=searchParams.get('interval')||'5m';
  if(!['5m','15m'].includes(interval))return NextResponse.json({error:'Unsupported interval'},{status:400});
- const results=await Promise.all(INDEXES.map(async index=>{try{const candles=await getChart(index.symbol,interval,'5d');return {...index,analysis:analyze(candles),error:null}}catch(e){return {...index,analysis:null,error:e.message}}}));
+ const results=await Promise.all(INDEXES.map(async index=>{try{const candles=await getChart(index.symbol,interval,'5d');const analysis=analyze(candles);const strategyEvaluation=evaluateStrategies(candles);return {...index,analysis:{...analysis,strategyEvaluation},error:null}}catch(e){return {...index,analysis:null,error:e.message}}}));
  const candidates=results.filter(x=>x.analysis&&x.analysis.status!=='NO TRADE');
  if(results.every(x=>!x.analysis))return NextResponse.json({error:'Could not load market data for the index list. Try again shortly.',details:results.map(x=>({index:x.name,error:x.error}))},{status:502});
  return NextResponse.json({interval,updatedAt:Date.now(),indexes:results,candidates,hiddenCount:results.filter(x=>x.analysis&&x.analysis.status==='NO TRADE').length});
