@@ -1,4 +1,4 @@
-import {NextResponse} from 'next/server';import {strategyBacktest,strategyHealth} from '@/lib/strategyBacktest';import {walkForward} from '@/lib/walkforward';
+import {NextResponse} from 'next/server';import {strategyBacktest,strategyHealth} from '@/lib/strategyBacktest';
 export const runtime='nodejs';
 const INDEXES=[['NIFTY','NIFTY 50','^NSEI'],['BANKNIFTY','BANK NIFTY','^NSEBANK'],['FINNIFTY','FINNIFTY','^CNXFINANCE'],['MIDCPNIFTY','NIFTY MIDCAP 50','^NSEMDCP50']];
 async function getChart(symbol){const u='https://query1.finance.yahoo.com/v8/finance/chart/'+encodeURIComponent(symbol)+'?interval=15m&range=60d&events=history';const r=await fetch(u,{headers:{'User-Agent':'Mozilla/5.0'},cache:'no-store'});if(!r.ok)throw Error('Market data source returned '+r.status);const j=await r.json(),x=j.chart?.result?.[0];if(!x)throw Error('No historical candles returned');const q=x.indicators.quote[0];return x.timestamp.map((t,i)=>({time:t*1000,open:q.open[i],high:q.high[i],low:q.low[i],close:q.close[i],volume:q.volume?.[i]||0})).filter(c=>[c.open,c.high,c.low,c.close].every(Number.isFinite))}
