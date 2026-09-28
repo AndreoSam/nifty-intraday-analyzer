@@ -7,7 +7,7 @@ const INDEXES = [
   { id: 'NIFTY', name: 'NIFTY 50', symbol: '^NSEI' },
   { id: 'BANKNIFTY', name: 'BANK NIFTY', symbol: '^NSEBANK' },
   { id: 'FINNIFTY', name: 'FINNIFTY', symbol: '^CNXFINANCE' },
-  { id: 'MIDCPNIFTY', name: 'MIDCPNIFTY', symbol: '^NSEMDCP50' }
+  { id: 'MIDCPNIFTY', name: 'NIFTY MIDCAP 50', symbol: '^NSEMDCP50' }
 ];
 
 async function getChart(symbol) {
