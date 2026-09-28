@@ -2,7 +2,6 @@ import { NextResponse } from 'next/server';
 import { backtest } from '@/lib/backtest';
 
 export const runtime = 'nodejs';
-export const maxDuration = 60;
 
 const INDEXES = [
   { id: 'NIFTY', name: 'NIFTY 50', symbol: '^NSEI' },
